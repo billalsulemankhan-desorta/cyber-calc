@@ -1,86 +1,104 @@
-import tkinter as tk
+import streamlit as st
 
-# Main window setup
-root = tk.Tk()
-root.title("Calculator")
-root.geometry("360x640")
-root.config(bg="#121212")
-root.resizable(False, False)
+# Page Configuration
+st.set_page_config(page_title="Calculator", layout="centered")
 
-# Input text variable
-expression = ""
+# Custom CSS for Dark Theme and Calculator Buttons Alignment
+st.markdown("""
+    <style>
+    /* Dark background */
+    .stApp {
+        background-color: #000000;
+        color: #ffffff;
+    }
+    
+    /* Screen display styling */
+    .display-screen {
+        background-color: #000000;
+        color: #ffffff;
+        font-size: 48px;
+        text-align: right;
+        padding: 20px;
+        font-weight: 300;
+        min-height: 80px;
+        word-wrap: break-word;
+    }
 
-def press(num):
-    global expression
-    expression += str(num)
-    equation.set(expression)
+    /* Base style for all buttons */
+    div.stButton > button {
+        width: 100%;
+        height: 70px;
+        font-size: 28px !important;
+        border-radius: 50% !important;
+        border: none !important;
+        background-color: #1c1c1e !important;
+        color: #ffffff !important;
+        font-weight: 400;
+    }
 
-def clear():
-    global expression
-    expression = ""
-    equation.set("")
+    /* Red Text Button (Clear) */
+    div.stButton > button[data-testid="baseButton-secondary"]:nth-child(1) {
+        color: #ff5252 !important;
+    }
 
-def equalpress():
-    try:
-        global expression
-        # Percentage aur operators handle karne ke liye
-        total = str(eval(expression.replace('%', '/100*').replace('×', '*').replace('÷', '/')))
-        equation.set(total)
-        expression = total
-    except:
-        equation.set("Error")
-        expression = ""
+    /* Equal Button Style */
+    div[data-testid="stHorizontalBlock"] > div:nth-child(4) div.stButton > button {
+        color: #25d366 !important;
+    }
 
-equation = tk.StringVar()
+    /* Filled Equal Button */
+    .equal-btn div.stButton > button {
+        background-color: #25d366 !important;
+        color: #ffffff !important;
+        border-radius: 20px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# Display Screen (Upar ka hissa)
-display_frame = tk.Frame(root, bg="#121212", height=180)
-display_frame.pack(fill=tk.X, padx=20, pady=20)
+# Initialize Session State for Equation
+if "expression" not in st.session_state:
+    st.session_state.expression = ""
 
-screen = tk.Label(display_frame, textvariable=equation, font=('Arial', 36), bg="#121212", fg="#ffffff", anchor='e')
-screen.pack(fill=tk.BOTH, expand=True)
+def btn_click(symbol):
+    if symbol == "C":
+        st.session_state.expression = ""
+    elif symbol == "⌫":
+        st.session_state.expression = st.session_state.expression[:-1]
+    elif symbol == "=":
+        try:
+            expr = st.session_state.expression.replace('%', '/100*').replace('×', '*').replace('÷', '/')
+            st.session_state.expression = str(eval(expr))
+        except Exception:
+            st.session_state.expression = "Error"
+    else:
+        if st.session_state.expression == "Error":
+            st.session_state.expression = ""
+        st.session_state.expression += str(symbol)
 
-# Keypad Frame (Neeche ka 4-column grid layout)
-keypad_frame = tk.Frame(root, bg="#1c1c1e")
-keypad_frame.pack(fill=tk.BOTH, expand=True)
+# Display Screen
+display_text = st.session_state.expression if st.session_state.expression else "0"
+st.markdown(f'<div class="display-screen">{display_text}</div>', unsafe_allow_html=True)
 
-# Buttons Configuration (Normal Calculator Pattern: 4 columns per row)
+# Grid Layout: 4 Columns per row (Normal Calculator Pattern)
 buttons = [
-    ('C', 0, 0, '#ff5252'), ('%', 0, 1, '#25d366'), ('⌫', 0, 2, '#25d366'), ('÷', 0, 3, '#25d366'),
-    ('7', 1, 0, '#ffffff'), ('8', 1, 1, '#ffffff'), ('9', 1, 2, '#ffffff'), ('×', 1, 3, '#25d366'),
-    ('4', 2, 0, '#ffffff'), ('5', 2, 1, '#ffffff'), ('6', 2, 2, '#ffffff'), ('-', 2, 3, '#25d366'),
-    ('1', 3, 0, '#ffffff'), ('2', 3, 1, '#ffffff'), ('3', 3, 2, '#ffffff'), ('+', 3, 3, '#25d366'),
-    ('🎨', 4, 0, '#25d366'), ('0', 4, 1, '#ffffff'), ('.', 4, 2, '#ffffff'), ('=', 4, 3, '#ffffff')
+    ['C', '%', '⌫', '÷'],
+    ['7', '8', '9', '×'],
+    ['4', '5', '6', '-'],
+    ['1', '2', '3', '+'],
+    ['🎨', '0', '.', '=']
 ]
 
-for (text, row, col, fg_color) in buttons:
-    if text == 'C':
-        action = clear
-    elif text == '=':
-        action = equalpress
-    elif text == '÷':
-        action = lambda t='÷' : press(t)
-    elif text == '×':
-        action = lambda t='×' : press(t)
-    else:
-        action = lambda t=text: press(t)
-
-    # Equal button ke liye special green background aur baakiyon ke liye dark theme
-    bg_color = "#25d366" if text == '=' else "#1c1c1e"
-    text_color = "#ffffff" if text == '=' else fg_color
-
-    btn = tk.Button(
-        keypad_frame, text=text, font=('Arial', 22, 'bold'),
-        bg=bg_color, fg=text_color, bd=0, activebackground="#333",
-        activeforeground=text_color, command=action
-    )
-    # Grid method ensure karta hai ki buttons aage (columns me) aur niche rows me theek se fit hon
-    btn.grid(row=row, column=col, sticky="nsew", padx=4, pady=4)
-
-# Grid weights set karna taaki saare buttons barabar space lein
-for i in range(5):
-    keypad_frame.rowconfigure(i, weight=1)
-for i in range(4):
-    keypad_frame.columnconfigure(i, weight=1)
-
-root.mainloop()
+# Render Grid Buttons
+for row in buttons:
+    cols = st.columns(4)
+    for col, btn in zip(cols, row):
+        with col:
+            # Special wrapper class for Equal button
+            if btn == '=':
+                st.markdown('<div class="equal-btn">', unsafe_allow_html=True)
+                if st.button(btn, key=f"btn_{btn}"):
+                    btn_click(btn)
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                if st.button(btn, key=f"btn_{btn}"):
+                    btn_click(btn)
