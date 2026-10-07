@@ -1,125 +1,113 @@
 import streamlit as st
 
-# Set responsive page layout
+# Set responsive page configuration
 st.set_page_config(page_title="CYBER-CALC", page_icon="⚡", layout="centered")
 
-# Custom Responsive Cyberpunk CSS (Optimized for Mobile & Laptop)
+# Custom Cyberpunk Styling: Dark Gradient Background, Neon Display, Electric Yellow Buttons
 st.markdown("""
     <style>
-    /* Dark Neon Theme */
+    /* Dark Cyberpunk Gradient Background */
     .stApp {
-        background-color: #08090d;
+        background: linear-gradient(135deg, #0a0814 0%, #04060f 50%, #110722 100%);
         color: #00F0FF;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     
-    /* Container styling to look like a mobile device frame */
+    /* Responsive App Container (Mobile & Laptop Viewport) */
     .block-container {
-        max-width: 420px !important;
-        padding-top: 1.5rem !important;
-        padding-bottom: 2rem !important;
+        max-width: 440px !important;
+        padding: 1rem 0.8rem !important;
     }
     
-    /* Neon HUD Screen */
+    /* Neon HUD Screen Display */
     .hud-screen {
-        background: #030406;
-        border: 2px solid #FF007F;
-        border-radius: 12px;
-        padding: 15px 20px;
+        background: #02050a;
+        border: 2px solid #00F0FF;
+        border-radius: 16px;
+        padding: 16px 20px;
         text-align: right;
-        box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), inset 0 0 12px rgba(0, 240, 255, 0.2);
         margin-bottom: 20px;
     }
     
+    /* Neon History Line */
     .hud-history {
-        color: #00F0FF;
-        font-size: 14px;
-        min-height: 20px;
-        opacity: 0.7;
+        color: #FF007F;
+        font-size: 16px;
+        min-height: 24px;
+        font-weight: 600;
+        letter-spacing: 1px;
     }
     
+    /* Neon Green Main Output */
     .hud-main {
         color: #00FF66;
-        font-size: 38px;
-        font-weight: bold;
+        font-size: 42px;
+        font-weight: 800;
         word-wrap: break-word;
         font-family: 'Courier New', monospace;
+        text-shadow: 0 0 15px #00FF66;
     }
     
-    /* Button Base Styling */
+    /* High-Visibility Electric Yellow Buttons */
     .stButton>button {
-        border-radius: 10px !important;
-        font-size: 22px !important;
-        font-weight: bold !important;
-        height: 62px !important;
+        background-color: #FFD700 !important;
+        color: #000000 !important;
+        border: 2px solid #FFA500 !important;
+        border-radius: 14px !important;
+        font-size: 24px !important;
+        font-weight: 900 !important;
+        height: 64px !important;
         width: 100% !important;
-        margin-bottom: 8px;
-        transition: all 0.15s ease-in-out;
+        margin-bottom: 6px;
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.4) !important;
+        transition: all 0.12s ease-in-out;
+        -webkit-tap-highlight-color: transparent;
     }
     
-    /* Specific Button Variants */
-    /* Number Keys */
-    div[data-testid="column"] button {
-        background-color: #121420;
-        color: #00F0FF;
-        border: 1px solid #00F0FF;
-        box-shadow: 0 0 6px rgba(0, 240, 255, 0.2);
+    /* Touch & Hover Glowing Effects */
+    .stButton>button:active, .stButton>button:hover {
+        background-color: #FFEE55 !important;
+        transform: scale(0.97);
+        box-shadow: 0 0 22px rgba(255, 238, 85, 0.9) !important;
     }
     
     /* Operator Keys (*, /, +, -) */
     div[data-testid="column"]:nth-child(4) button {
-        background-color: #1a0926;
-        color: #FF007F;
-        border: 1px solid #FF007F;
-        box-shadow: 0 0 8px rgba(255, 0, 127, 0.3);
+        background-color: #FF9900 !important;
+        border: 2px solid #FF6600 !important;
+        box-shadow: 0 0 16px rgba(255, 153, 0, 0.5) !important;
     }
     
-    /* Equal Button */
+    /* Glowing Equal Key (=) */
     .equal-btn button {
         background-color: #00FF66 !important;
         color: #000000 !important;
-        border: none !important;
-        box-shadow: 0 0 15px #00FF66 !important;
-    }
-    
-    .stButton>button:hover {
-        transform: scale(1.03);
-        filter: brightness(1.2);
+        border: 2px solid #00CC55 !important;
+        box-shadow: 0 0 22px #00FF66 !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# State initialization
+# State Management
 if "expr" not in st.session_state:
     st.session_state.expr = ""
 if "history" not in st.session_state:
     st.session_state.history = ""
 
 # Header
-st.markdown("<h3 style='text-align: center; color: #00F0FF; margin-bottom: 15px;'>⚡ CYBER-CALC</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #00F0FF; text-shadow: 0 0 12px #00F0FF; margin-bottom: 14px;'>⚡ CYBER-CALC</h3>", unsafe_allow_html=True)
 
-# HUD Screen Render
-history_disp = st.session_state.history if st.session_state.history else "&nbsp;"
-main_disp = st.session_state.expr if st.session_state.expr else "0"
-
-st.markdown(f"""
-    <div class="hud-screen">
-        <div class="hud-history">{history_disp}</div>
-        <div class="hud-main">{main_disp}</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# Input handler function
+# Calculation Logic
 def press(val):
-    if val == "C":
+    if val in ["C", "clear"]:
         st.session_state.expr = ""
         st.session_state.history = ""
-    elif val == "⌫":
+    elif val in ["⌫", "backspace"]:
         st.session_state.expr = st.session_state.expr[:-1]
-    elif val == "=":
+    elif val in ["=", "enter"]:
         if st.session_state.expr:
             try:
-                # Replace visual operators with math operators
                 clean_expr = st.session_state.expr.replace("×", "*").replace("÷", "/")
                 res = eval(clean_expr)
                 st.session_state.history = f"{st.session_state.expr} ="
@@ -137,7 +125,29 @@ def press(val):
             st.session_state.expr = ""
         st.session_state.expr += str(val)
 
-# App Keypad Layout
+# Render Neon Display Screen
+history_disp = st.session_state.history if st.session_state.history else "&nbsp;"
+main_disp = st.session_state.expr if st.session_state.expr else "0"
+
+st.markdown(f"""
+    <div class="hud-screen">
+        <div class="hud-history">{history_disp}</div>
+        <div class="hud-main">{main_disp}</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Optional Laptop Keyboard Input Field
+with st.expander("⌨️ Laptop Keyboard Input"):
+    kb_input = st.text_input("Type numbers/math directly:", key="kb_field", placeholder="e.g. 125*8")
+    if kb_input:
+        try:
+            res = eval(kb_input)
+            st.session_state.history = f"{kb_input} ="
+            st.session_state.expr = str(int(res) if isinstance(res, float) and res.is_integer() else round(res, 6))
+        except Exception:
+            st.session_state.expr = "ERROR"
+
+# Touch Keypad Grid Layout
 layout = [
     ["C", "⌫", "%", "÷"],
     ["7", "8", "9", "×"],
@@ -151,7 +161,6 @@ for row in layout:
     for i, symbol in enumerate(row):
         key_id = f"k_{symbol}"
         if symbol == "=":
-            # Wrap equal button for distinct styling
             with cols[i]:
                 st.markdown('<div class="equal-btn">', unsafe_allow_html=True)
                 st.button(symbol, key=key_id, on_click=press, args=(symbol,))
